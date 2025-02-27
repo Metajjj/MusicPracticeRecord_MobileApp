@@ -1,13 +1,54 @@
 package com.example.musicpracticerecord;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
+
+    public static class DbStructure {
+        public static class PracticeSession{
+            public static class Date{
+                public String
+                    Name = this.getClass().getSimpleName() , Type = "INTEGER PRIMARY KEY NOT NULL";
+            }
+            public static class Duration{
+                public String
+                    Name = this.getClass().getSimpleName() , Type = "INTEGER";
+            }
+
+            public static String[] Constraints = new String[]{};
+        }
+        public static class MusicPiece{
+            public static class MusicPiece_ID {
+                public String Name=this.getClass().getSimpleName(), Type = "INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL";
+            }
+            public static class Song{
+                public String Name= this.getClass().getSimpleName(), Type="TEXT";
+            }
+            public static class Artist{
+                public String Name=this.getClass().getSimpleName(), Type="TEXT";
+            }
+            public static class PracSessID{
+                public String Name=this.getClass().getSimpleName(), Type="INTEGER";
+            }
+            public static String[] Constraints = new String[]{
+                String.format("UNIQUE(%1$s,%2$s)",new Song().Name, new Artist().Name )
+              //unique(col1, col2) = (d,a)(d,a) not allowed (d,a)(d,b) allowed
+              ,
+                String.format("FOREIGN KEY (%1$s) REFERENCES %2$s (`%3$s`)"
+                  ,
+                new PracSessID().Name, PracticeSession.class.getSimpleName(), new PracticeSession.Date().Name )
+            };
+        }
+    }
 
     /*
     Replace SQLITE with a pure .txt file ?
@@ -15,7 +56,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         Plain .txt{
             MusicPiece.txt{
-             ID|Song|Artist|Duration
+             Song|Artist|Duration
             }
             PracticeSession.txt{
              Duration|Array[MusicPieceIDs]
@@ -24,24 +65,30 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         DATABASE {
             TABLE MusicPiece {
-                MP_ID : INT
+                PK : INT AUTO_I
+
                 Song : (string) UNIQUE
                 Artist: (string) UNIQUE
-                Duration (secs) : ss (int)
+
+                FK : PracSesID
+
+                --composite PK based on song and artist , skips need for PK col, more complex joins
                 -- MUST CHECK IF SONG N ARTIST ARE UNIQUE ? EXIST?
             }
             TABLE PracticeSessions{
                 Date : YYYYMMDD (no time) UNIQUE PK (is unique)
                 Duration : SUM (Piece.Duration)
+                MusicArray[commaSeperated,1,2,545]
             }
 
-                --Used for the 1-to-many (robust go-to)
-            TABLE JunctionTable{
+            FK on Music to Link to Practice
 
-            }
             1 PracticeSession - MANY MusicPiece
         }
         `` [] ""  all allow whitespace ` for delimiters too
+        ' single quote for strings!
+
+        SQL PK and FK as key and keyhole! (how to join and fit tables together)
 
         ==SQL syntax==
         CREATE TABLE MusicPiece (
@@ -66,41 +113,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     */
 
     private static final String DBname = "MusicPracticeTracker";
-
-    private int AutoIncrementVal;
-    protected synchronized int getAutoIncrement(){
-        RecheckAutoIncrement(); return ++AutoIncrementVal;
-    }
-
-    protected synchronized void RecheckAutoIncrement(){
-
-
-        //Loop thru database = highest ID + 1
-        ArrayList<HashMap<String,String>> Datas = CursorSorter( this.getReadableDatabase().query(TBLname,new String[]{new ID().Name},null,null,null,null, new ID().Name + " ASC") );
-
-        for (int i=1;i<=Datas.size();i++ ) {
-            String CurrID = Datas.get( i-1 ).get( new ID().Name );
-            //System.out.println("i: "+ i +" | ID: "+CurrID);
-            if(! CurrID.equals(i+"")){
-                //Update to fill up empty spots in ID
-                AutoIncrementVal=--i;
-                break;
-            }
-            //Update innate A_I to match my new latest ID
-            if(i==Datas.size()){ AutoIncrementVal=i; }
-        }
-
-        //DatabaseHandler.this.close();
-    }
-
     private static DatabaseHandler DBinstance = null;
 
     //synchronise = lock() - 1 thread per time
     public static synchronized DatabaseHandler getInstance(Context c){
 
-        if(DBinstance == null){
-            DBinstance = new DatabaseHandler(c);
-        }
+        if(DBinstance == null){ DBinstance = new DatabaseHandler(c); }
         return DBinstance;
     }
 
@@ -108,64 +126,116 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         super(c, DBname, null, 1);
     }
 
-    protected void ResetTable(){
+    protected synchronized void ResetTable(){
         try(SQLiteDatabase sqldb = this.getWritableDatabase()){
-
             ResetTable(sqldb);
-
-        }catch (Exception e){}
+        }catch (Exception e){System.err.println(e);}
     }
 
-    protected void ResetTable(SQLiteDatabase s) {
-        //s.beginTransaction(); //TODO research begingTransact
+    protected synchronized void ResetTable(SQLiteDatabase s) {
+        //s.beginTransaction(); //TODO research beginTransact
 
-            //Cleans tables
-        s.execSQL("DROP TABLE IF EXISTS `MusicPiece`;");
-        s.execSQL("DROP TABLE IF EXISTS `PracticeSession`;");
+        ArrayList<String> Cmds = new ArrayList<>();
 
-        //A_I allows PK insertion!!
-        String cmd = "CREATE TABLE `MusicPiece` (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL , Song TEXT UNIQUE, Artist TEXT UNIQUE, Duration INT);";
-        cmd += "CREATE TABLE `PracticeSession` (ID INT PRIMARY KEY NOT NULL , Date INT);";
+        try {
+            for (Class<?> C : DbStructure.class.getDeclaredClasses()) {
+                //Clean up DB
+                Cmds.add("DROP TABLE IF EXISTS "+C.getSimpleName()+";");
 
-        //TODO practice https://sqliteonline.com/
-        /*
-DROP TABLE IF EXISTS `MusicPiece`;
-CREATE TABLE `MusicPiece` (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL , Song TEXT UNIQUE , Artist TEXT UNIQUE , Duration INT);
+                String cmd = "";
+                //Create Tbl
+                cmd += "CREATE TABLE " + C.getSimpleName() + " ( ";
 
+                //Add columns
+                for (Class<?> C2 : C.getDeclaredClasses()) {
+                    //cmd += C2.getSimpleName();
+                    for(Field F : C2.getFields()){
 
-DROP TABLE IF EXISTS `PracticeSession`;
-CREATE TABLE `PracticeSession` (ID INT PRIMARY KEY NOT NULL , Date INT);
+                        if(F.getName()=="Name"){
+                            cmd += "`"+F.get(C2.newInstance()) + "` ";
+                        }else {
+                            cmd += F.get(C2.newInstance()) + " ";
+                        }
 
-INSERT INTO `MusicPiece` (Song, Artist, Duration, ID) VALUES ('S' , 'D' , 60, 5);
+                    }
 
-SELECT * FROM MusicPiece;
-        */
+                        //If not last class, means another col to add
+                    if(C2 != C.getDeclaredClasses()[C.getDeclaredClasses().length-1]){
+                        cmd+=", ";
+                    }
+                }
 
+                String[] Constraints = (String[]) C.getField("Constraints").get(null);
 
-        s.execSQL(cmd);
-        //s.close();
+                //Add constraints
+                if(Constraints != null && Constraints.length>0){
+                    cmd+= ", " + String.join(" , ",Constraints)+" ";
+                }
+
+                cmd += ") ; "; //\n ruining SQL cmd?
+
+                Cmds.add(cmd);
+            }
+        } catch (Exception e){ System.err.println(e); }
+
+        //execSQL cannot execute multiple cmds at once!
+        for(String cmd : Cmds){
+            System.out.println("Executing: "+cmd);
+            s.execSQL(cmd);
+        }
+    }
+    //TODO practice https://sqliteonline.com/
+
+    protected synchronized void MockData(){
+        ContentValues cv = new ContentValues();
+
+        //Mock PracSess tbl
+        cv.put(new DbStructure.PracticeSession.Date().Name, "5");
+        cv.put(DbStructure.PracticeSession.Duration.class.getSimpleName(),"240");
+        this.getReadableDatabase().insert(DbStructure.PracticeSession.class.getSimpleName(),null,cv);
+
+        //Mock MusPrac tbl
+        cv = new ContentValues();
+        cv.put(DbStructure.MusicPiece.Song.class.getSimpleName(),"Song1");
+        cv.put(DbStructure.MusicPiece.Artist.class.getSimpleName(),"Artist1");
+        this.getReadableDatabase().insert(DbStructure.MusicPiece.class.getSimpleName(),"null",cv);
+
+        cv = new ContentValues();
+        cv.put(DbStructure.MusicPiece.Song.class.getSimpleName(),"Song2");
+        cv.put(DbStructure.MusicPiece.Artist.class.getSimpleName(),"Artist1");
+        cv.put(DbStructure.MusicPiece.PracSessID.class.getSimpleName(),"5");
+        this.getReadableDatabase().insert(DbStructure.MusicPiece.class.getSimpleName(),"null",cv);
+
+        this.getReadableDatabase().close();
+    }
+
+    protected synchronized ArrayList<HashMap<String,String>> CursorSorter(Cursor c){
+
+        ArrayList<HashMap<String,String>> res = new ArrayList<>();
+
+        if(c.moveToFirst()){
+            do{
+                HashMap<String,String> row = new HashMap<>();
+                for(int i=0;i<c.getColumnCount();i++) {
+                    row.put(c.getColumnNames()[i],c.getString((i)));
+                }
+                res.add(row);
+            }
+            while(c.moveToNext());
+        }
+
+        c.close();
+        return res;
     }
 
     @Override
-    protected void finalize() throws Throwable {
-        this.close();
-        super.finalize();
-    }
+    protected void finalize() throws Throwable { this.close(); super.finalize(); }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-
-        //create db
-        /* Skip this? alrdy creates in ResetTable
-        sqLiteDatabase.execSQL(
-                "CREATE TABLE `" + DBname + "` (`" + ID + "` INTEGER PRIMARY KEY AUTOINCREMENT, `" + YMDHMS + "` INT, `" + TITLE + "` TEXT, `"+NOTE+"` TEXT, `"+R_TIME+"` TEXT)"
-        );*/
-
-        ResetTable(sqLiteDatabase);
+        ResetTable();
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
-    }
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {}
 }
