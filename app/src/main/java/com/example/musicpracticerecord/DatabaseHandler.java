@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -27,25 +26,39 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             public static String[] Constraints = new String[]{};
         }
         public static class MusicPiece{
-            public static class MusicPiece_ID {
-                public String Name=this.getClass().getSimpleName(), Type = "INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL";
-            }
             public static class Song{
                 public String Name= this.getClass().getSimpleName(), Type="TEXT";
             }
             public static class Artist{
                 public String Name=this.getClass().getSimpleName(), Type="TEXT";
             }
-            public static class PracSessID{
-                public String Name=this.getClass().getSimpleName(), Type="INTEGER";
+            public static String[] Constraints = new String[]{
+                String.format("PRIMARY KEY(%1$s , %2$s)",new Song().Name, new Artist().Name )
+              //unique(col1, col2) = (d,a)(d,a) not allowed (d,a)(d,b) allowed
+                //PK = unique & notNull
+            };
+        }
+        public static class Prac2Muse {
+            public static class PrSsID{
+                public String Name = this.getClass().getSimpleName(), Type = "INTEGER";
+            }
+            public static class MuPeSong{
+                public String Name = this.getClass().getSimpleName(), Type = "TEXT";
+            }
+            public static class MuPeArtist{
+                public String Name = this.getClass().getSimpleName(), Type = "TEXT";
             }
             public static String[] Constraints = new String[]{
-                String.format("UNIQUE(%1$s,%2$s)",new Song().Name, new Artist().Name )
-              //unique(col1, col2) = (d,a)(d,a) not allowed (d,a)(d,b) allowed
-              ,
-                String.format("FOREIGN KEY (%1$s) REFERENCES %2$s (`%3$s`)"
-                  ,
-                new PracSessID().Name, PracticeSession.class.getSimpleName(), new PracticeSession.Date().Name )
+                String.format("FOREIGN KEY (%1$s) REFERENCES %2$s (`%3$s`) ON DELETE CASCADE ON UPDATE CASCADE"
+                    ,
+                    new Prac2Muse.PrSsID().Name, PracticeSession.class.getSimpleName(), new PracticeSession.Date().Name )
+                ,
+                //Order doesnt matter but table must contain same colName as PK
+                //Can be opposite to PK constraint order
+                //Must be same order on the ForeignKey Constraint
+                String.format("FOREIGN KEY (%1$s,%2$s) REFERENCES %3$s (`%4$s` , `%5$s`) ON DELETE CASCADE ON UPDATE CASCADE"
+                    ,
+                    new Prac2Muse.MuPeSong().Name, MuPeArtist.class.getSimpleName(), MusicPiece.class.getSimpleName(), new MusicPiece.Song().Name, MusicPiece.Artist.class.getSimpleName() )
             };
         }
     }
@@ -96,7 +109,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             Song TEXT NOT NULL UNIQUE,
             Artist TEXT NOT NULL UNIQUE,
             Duration INT NOT NULL ,
-            --CONSTRAINT MusicPiece_ID PRIMARY KEY ( Song , Artist )
+            --CONSTRAINT MusicPieceID PRIMARY KEY ( Song , Artist )
         );
             --constraint = name for the cols together, doesnt make new one to ref outside
 
@@ -126,20 +139,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         super(c, DBname, null, 1);
     }
 
-    protected synchronized void ResetTable(){
+    protected synchronized void WipeDB(Context c){
+        this.getReadableDatabase().close();
+        this.getWritableDatabase().close();
+        c.deleteDatabase(DBname);
+    }
+
+    protected synchronized void ResetTables(){
         try(SQLiteDatabase sqldb = this.getWritableDatabase()){
-            ResetTable(sqldb);
+            ResetTables(sqldb);
         }catch (Exception e){System.err.println(e);}
     }
 
-    protected synchronized void ResetTable(SQLiteDatabase s) {
+    protected synchronized void ResetTables(SQLiteDatabase s) {
         //s.beginTransaction(); //TODO research beginTransact
 
         ArrayList<String> Cmds = new ArrayList<>();
 
+        Cmds.add("PRAGMA foreign_keys = ON;");
+        //Allows the ON DELETE constraints to work
+
         try {
-            for (Class<?> C : DbStructure.class.getDeclaredClasses()) {
-                //Clean up DB
+            for (Class<?> C : DbStructure.class.getDeclaredClasses()){
+                //Clean up Tbls
                 Cmds.add("DROP TABLE IF EXISTS "+C.getSimpleName()+";");
 
                 String cmd = "";
@@ -156,7 +178,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         }else {
                             cmd += F.get(C2.newInstance()) + " ";
                         }
-
                     }
 
                         //If not last class, means another col to add
@@ -165,6 +186,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     }
                 }
 
+                //TODO err getting constraints for junction table
                 String[] Constraints = (String[]) C.getField("Constraints").get(null);
 
                 //Add constraints
@@ -203,8 +225,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         cv = new ContentValues();
         cv.put(DbStructure.MusicPiece.Song.class.getSimpleName(),"Song2");
         cv.put(DbStructure.MusicPiece.Artist.class.getSimpleName(),"Artist1");
-        cv.put(DbStructure.MusicPiece.PracSessID.class.getSimpleName(),"5");
-        this.getReadableDatabase().insert(DbStructure.MusicPiece.class.getSimpleName(),"null",cv);
+        this.getReadableDatabase().insert(DbStructure.MusicPiece.class.getSimpleName(),null,cv);
+
+        //Mock junction
+        cv = new ContentValues();
+        cv.put(DbStructure.Prac2Muse.PrSsID.class.getSimpleName(),5);
+        cv.put(DbStructure.Prac2Muse.MuPeSong.class.getSimpleName(),"Song1");
+        cv.put(DbStructure.Prac2Muse.MuPeArtist.class.getSimpleName(),"Artist1");
 
         this.getReadableDatabase().close();
     }
@@ -233,7 +260,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        ResetTable();
+        ResetTables();
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.example.musicpracticerecord;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -23,31 +22,31 @@ public class Home extends AppCompatActivity {
 
         var dh = DatabaseHandler.getInstance(context);
 
-        dh.ResetTable();
+        System.out.println("A");
 
-        //TODO err clm doesnt exist for given tbl!
+        dh.ResetTables();
 
         dh.MockData();
+        //TODO test for junc  tbl
+        /*
+        INSERT INTO MusicPiece (song, artist) VALUES  ('Song1', 'Artist1'), ('Song2','Artist1'), ('Song1','Artist2') ;
 
-        Cursor c = dh.getReadableDatabase().rawQuery(String.format("SELECT * FROM %1$s AS mp LEFT JOIN %2$s AS ps ON mp.%3$s = ps.%4$s",
-            DatabaseHandler.DbStructure.MusicPiece.class.getSimpleName(),
-            DatabaseHandler.DbStructure.PracticeSession.class.getSimpleName(),
-            DatabaseHandler.DbStructure.MusicPiece.PracSessID.class.getSimpleName(), DatabaseHandler.DbStructure.PracticeSession.Date.class.getSimpleName()
-        ),null);
+INSERT INTO PracticeSession (`Date`, Duration) VALUES (5, 240), (3,30) ;
 
-        if(c.moveToFirst()){
-            String res = "";
-            do{
-                for(int i=0;i<c.getColumnCount();i++) {
-                    res += c.getColumnNames()[i] +" : "+c.getString(i)+" | ";
-                }
-                res+="\n";
-            }
-            while(c.moveToNext());
-            System.out.println(res);
-        }
+INSERT INTO Prac2Muse (PrSsID, Song, Artist) VALUES (5, 'Song1', 'Artist1');
+        */
 
-        c.close();
+        var res = dh.CursorSorter(dh.getReadableDatabase().rawQuery("SELECT * FROM Prac2Muse AS pm " +
+                "INNER JOIN PracticeSession AS ps " +
+                "ON pm.PrSsID = ps.Date " +
+                "INNER JOIN MusicPiece AS mp " +
+                "ON pm.MuPeSong = mp.Song AND pm.MuPeArtist = mp.Artist;"
+            ,null)
+        );
+
+        System.out.println(res);
+
+
     }
 
     private Context context;
