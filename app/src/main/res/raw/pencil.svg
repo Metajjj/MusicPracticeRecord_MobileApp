@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="300"
+   height="300"
+   viewBox="0 0 300 300"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <g id="layer1">
+    <path
+       id="pencilBody"
+       style="fill:none;stroke:none;stroke-width:10px"
+       d="M 225 50 l -200, 200 l 25,25 l 200,-200 z" />
+    <path
+       id="pencilDetails"
+       style="fill:none;stroke:#000;stroke-width:5px"
+       d="M 220 50 l -200,200 M 230 60 l -200,200 M 240 70 l -200,200 M 250,80 l -200,200" />
+    <path
+       id="pencilTop"
+       style="fill:none;stroke:#000;stroke-width:10px"
+       d="M 250,25 L 275,50 L 250,75 L 225, 50 z" />
+    <path
+       id="pencilTip"
+       style="fill:#e9c6af;stroke:#000;stroke-width:5px"
+       d="M 17 250 v 34 h 34 z M 17 280 h 10 l -8,-8 v 10" />
+    <path
+       id="metal"
+       style="fill:#b7b7b7;stroke:#b7b7b7;stroke-width:10px;stroke-opacity:1"
+       d="M 215,50 l 35,35" />
+  </g>
+</svg>

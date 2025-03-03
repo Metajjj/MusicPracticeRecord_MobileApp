@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:width="300px"
+    android:height="300px"
+    android:viewportHeight="300"
+    android:viewportWidth="300">
+
+            <path
+                android:strokeWidth="10"
+                android:name="pencilBody"
+                android:pathData="M 225 50 l -200, 200 l 25,25 l 200,-200 z" />
+            <path
+                android:name="pencilDetails"
+                android:strokeColor="?attr/Foreground"
+                android:strokeWidth="5"
+                android:pathData="M 220 50 l -200,200 M 230 60 l -200,200 M 240 70 l -200,200 M 250,80 l -200,200" />
+            <path
+                android:strokeWidth="10" android:strokeColor="#000"                android:name="pencilTop"
+                android:pathData="M 250,25 L 275,50 L 250,75 L 225, 50 z" />
+            <path
+                android:name="pencilTip"
+                android:strokeWidth="5" android:strokeColor="#000" android:fillColor="#e9c6af"
+                android:pathData="M 17 250 v 34 h 34 z M 17 280 h 10 l -8,-8 v 10" />
+            <path
+                android:name="metal"
+                android:strokeWidth="10"
+                android:strokeColor="?attr/Background"
+                android:pathData="M 215,50 l 35,35" />
+
+</vector>

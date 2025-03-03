@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="300"
+   height="300"
+   viewBox="0 0 300 300"
+   version="1.1"
+   id="svg1"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     id="layer1">
+    <path
+       id="handleBottom"
+       style="stroke-width:10px;stroke:#FFFFFF;fill:none"
+       d="M 25,75 Q 150,25 275,75" />
+    <path
+       id="handleTop"
+       d="M 100,50 v -25 h 100 v 25"
+       style="stroke-width:10px;stroke:#FFFFFF;fill:none" />
+    <path
+       id="bucket"
+       style="stroke-width:10px;stroke:#FFFFFF;fill:none"
+       d="M 25 100 l 25 175 q 100,-25 200,0 M 275 100 l -25 175 q -100,-25 -200,0" />
+    <path
+       id="bucketDetails"
+       style="fill:none;stroke:#ffffff;stroke-width:10px"
+       d="M 75 100 l 25 150 M 150 100 l 0 150 M 225 100 l -25 150" />
+  </g>
+</svg>

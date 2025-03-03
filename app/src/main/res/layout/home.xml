@@ -1,9 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    android:background="#111111"
+    android:theme="@style/MainTheme"
+
+    android:background="?attr/Background"
     >
+
+    <TextView
+        android:id="@+id/textView"
+
+        android:layout_width="0dp"
+        android:layout_height="118dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="50dp"
+        android:gravity="center"
+
+        android:text="Music Practice"
+        android:textAlignment="center"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView">
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TableRow android:layout_height="100dp">
+                <TextView android:layout_weight="1" android:text="AA"
+                    android:background="#FFFFFF"
+                    />
+                <ImageView
+                    android:layout_height="match_parent" android:layout_width="wrap_content"
+                    android:layout_weight="0.1"
+                    android:background="#ccc"
+                    android:src="@drawable/arrow"
+                    android:id="@+id/TestSvg"
+                    />
+            </TableRow>
+
+            <TableRow android:layout_height="50dp">
+                <TextView android:layout_weight="1" android:text="BB"
+                    android:background="#FFFFFF"
+                    />
+                <ImageView
+                    android:layout_height="match_parent" android:layout_width="wrap_content"
+                    android:layout_weight="0.1"
+                    android:background="#000000"
+                    />
+            </TableRow>
+
+        </TableLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

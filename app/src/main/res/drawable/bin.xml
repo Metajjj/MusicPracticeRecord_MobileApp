@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="300px"
+    android:height="300px"
+    android:viewportHeight="300"
+    android:viewportWidth="300">
+    <path
+        android:name="handleBottom"
+        android:strokeWidth="10"
+        android:strokeColor="?attr/Accent"
+        android:pathData="M 25,75 Q 150,25 275,75" />
+    <path
+        android:name="handleTop"
+        android:pathData="M 100,50 v -25 h 100 v 25"
+        android:strokeWidth="10"
+        android:strokeColor="?attr/Accent"
+        />
+    <path
+        android:name="bucket"
+        android:strokeWidth="10"
+        android:strokeColor="?attr/Accent"
+        android:pathData="M 25 100 l 25 175 q 100,-25 200,0 M 275 100 l -25 175 q -100,-25 -200,0" />
+    <path
+        android:name="bucketDetails"
+        android:strokeColor="?attr/Accent"
+        android:strokeWidth="10"
+        android:pathData="M 75 100 l 25 150 M 150 75 l 0 175 M 225 100 l -25 150" />
+</vector>

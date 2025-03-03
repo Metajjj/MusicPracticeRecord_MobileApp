@@ -209,31 +209,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     //TODO practice https://sqliteonline.com/
 
     protected synchronized void MockData(){
-        ContentValues cv = new ContentValues();
+        //PracSess
+        this.getWritableDatabase().execSQL("INSERT INTO PracticeSession (`Date`, Duration) VALUES (5, 240), (3,30) ;");
 
-        //Mock PracSess tbl
-        cv.put(new DbStructure.PracticeSession.Date().Name, "5");
-        cv.put(DbStructure.PracticeSession.Duration.class.getSimpleName(),"240");
-        this.getReadableDatabase().insert(DbStructure.PracticeSession.class.getSimpleName(),null,cv);
+        //MusPie
+        this.getWritableDatabase().execSQL("INSERT INTO MusicPiece (song, artist) VALUES  ('Song1', 'Artist1'), ('Song2','Artist1'), ('Song1','Artist2') ;");
 
-        //Mock MusPrac tbl
-        cv = new ContentValues();
-        cv.put(DbStructure.MusicPiece.Song.class.getSimpleName(),"Song1");
-        cv.put(DbStructure.MusicPiece.Artist.class.getSimpleName(),"Artist1");
-        this.getReadableDatabase().insert(DbStructure.MusicPiece.class.getSimpleName(),"null",cv);
-
-        cv = new ContentValues();
-        cv.put(DbStructure.MusicPiece.Song.class.getSimpleName(),"Song2");
-        cv.put(DbStructure.MusicPiece.Artist.class.getSimpleName(),"Artist1");
-        this.getReadableDatabase().insert(DbStructure.MusicPiece.class.getSimpleName(),null,cv);
-
-        //Mock junction
-        cv = new ContentValues();
-        cv.put(DbStructure.Prac2Muse.PrSsID.class.getSimpleName(),5);
-        cv.put(DbStructure.Prac2Muse.MuPeSong.class.getSimpleName(),"Song1");
-        cv.put(DbStructure.Prac2Muse.MuPeArtist.class.getSimpleName(),"Artist1");
-
-        this.getReadableDatabase().close();
+        //Junc
+        this.getWritableDatabase().execSQL("INSERT INTO Prac2Muse (PrSsID, MuPeSong, MuPeArtist) VALUES (5, 'Song1', 'Artist1');");
     }
 
     protected synchronized ArrayList<HashMap<String,String>> CursorSorter(Cursor c){

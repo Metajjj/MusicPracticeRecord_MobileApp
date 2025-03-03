@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="Background" format="color" />
+    <attr name="Foreground" format="color"/>
+    <attr name="Accent" format="color"/>
+
+    <!-- Main theme(s), declare the cols that attribute can access and treat as colours stated in format -->
+
+    <style name="MainTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="Background">#DDDDDD</item>
+        <item name="Foreground">#333333</item>
+        <item name="Accent">#6B08F2</item>
+    </style>
+</resources>
