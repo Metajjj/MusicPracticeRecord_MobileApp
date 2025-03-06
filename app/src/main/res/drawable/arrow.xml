@@ -1,14 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="300px"
-    android:height="300px"
-    android:viewportHeight="300"
-    android:viewportWidth="300">
+<?xml version="1.0" encoding="utf-8" ?>
 
-    <path android:name="downArrow"
-        android:strokeWidth="10" android:strokeColor="?attr/Accent" android:pathData="M 25,25 H 275 l -125,125 z" />
 
-    <path android:name="rightArrow"
-        android:strokeWidth="10" android:strokeColor="?attr/Accent" android:pathData="M 25,25 V 275 l 125,-125 z" />
+
+<vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+
+        android:width="300px"
+        android:height="300px"
+        android:viewportHeight="300"
+        android:viewportWidth="300">
+
+        <path
+
+   android:fillColor="?attr/Background" android:strokeWidth="20" android:strokeColor="?attr/Accent" android:pathData="M 25,100 h 250 l -125,125 z" />
+
+        <!-- border -->
+        <path android:pathData="M 0,0 H 300 V 300 H 0 V 0" android:strokeWidth="5" android:strokeColor="?attr/Foreground" />
 
 </vector>
+

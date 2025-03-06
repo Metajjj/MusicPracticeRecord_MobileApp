@@ -25,4 +25,7 @@
         android:strokeColor="?attr/Accent"
         android:strokeWidth="10"
         android:pathData="M 75 100 l 25 150 M 150 75 l 0 175 M 225 100 l -25 150" />
+
+    <!-- border -->
+    <path android:pathData="M 0,0 H 300 V 300 H 0 V 0" android:strokeWidth="5" android:strokeColor="?attr/Foreground" />
 </vector>

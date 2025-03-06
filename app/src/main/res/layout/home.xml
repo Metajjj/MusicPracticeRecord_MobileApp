@@ -8,10 +8,21 @@
     android:theme="@style/MainTheme"
 
     android:background="?attr/Background"
+
+    android:id="@+id/homeBg"
     >
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/homeTitle"
+
+        android:textColor="?attr/Foreground"
+
+        android:textStyle="bold"
+        android:shadowColor="?attr/Accent"
+
+        android:shadowRadius="5"
+        android:shadowDy="5"
+
 
         android:layout_width="0dp"
         android:layout_height="118dp"
@@ -28,6 +39,9 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
+
+        android:id="@+id/homeScroll"
+
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="50dp"
@@ -38,32 +52,76 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView">
+        app:layout_constraintTop_toBottomOf="@+id/homeTitle">
         <TableLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
 
-            <TableRow android:layout_height="100dp">
-                <TextView android:layout_weight="1" android:text="AA"
-                    android:background="#FFFFFF"
-                    />
+            android:id="@+id/homeTable"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:background="?attr/Foreground"
+
+            android:padding="5dp"
+
+            >
+
+            <TableRow
+                android:background="?attr/Background"
+                android:layout_margin="2dp"
+
+                >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_weight="100"
+                    android:background="?attr/Accent"
+                    android:gravity="center"
+
+                    android:padding="3dp"
+                    android:text="2024"
+                    android:textAlignment="center"
+                    android:textColor="?attr/Background"
+                    android:textStyle="bold" />
                 <ImageView
-                    android:layout_height="match_parent" android:layout_width="wrap_content"
-                    android:layout_weight="0.1"
-                    android:background="#ccc"
-                    android:src="@drawable/arrow"
+                    android:layout_height="40dp" android:layout_width="40dp"
+                    android:layout_weight="1"
+
+                    android:background="@drawable/arrow"
                     android:id="@+id/TestSvg"
                     />
             </TableRow>
 
-            <TableRow android:layout_height="50dp">
-                <TextView android:layout_weight="1" android:text="BB"
-                    android:background="#FFFFFF"
+            <TableRow
+                android:background="?attr/Background"
+                android:layout_margin="2dp"
+
+                >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_weight="100"
+                    android:background="?attr/Accent"
+                    android:gravity="center"
+
+                    android:padding="3dp"
+                    android:text="Dtest"
+                    android:textAlignment="center"
+                    android:textColor="?attr/Background"
+                    android:textStyle="bold" />
+                <ImageView
+                    android:layout_height="40dp" android:layout_width="40dp"
+                    android:layout_weight="1"
+
+                    android:background="@drawable/bin"
                     />
                 <ImageView
-                    android:layout_height="match_parent" android:layout_width="wrap_content"
-                    android:layout_weight="0.1"
-                    android:background="#000000"
+                    android:layout_height="40dp" android:layout_width="40dp"
+                    android:layout_weight="1"
+
+                    android:background="@drawable/pencil"
                     />
             </TableRow>
 
