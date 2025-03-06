@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:background="?attr/Background"
+
+    android:id="@+id/pracsessBg"
+    >
+
+    <ImageView
+        android:id="@+id/praccsessBackArrow"
+
+        android:rotation="90"
+
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="50dp"
+        android:background="@drawable/arrow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+
+        android:id="@+id/pracsessDel"
+
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="50dp"
+        android:background="@drawable/bin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/pracsessDuration"
+
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="50dp"
+        android:autoSizeTextType="uniform"
+        android:background="@drawable/pencil"
+
+        android:shadowColor="?attr/Foreground"
+        android:shadowRadius="6"
+        android:shadowDy="2"
+
+        android:gravity="center"
+        android:lines="1"
+        android:text="Artist"
+        android:textAlignment="center"
+        android:textColor="?attr/Foreground"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/pracsessDurationLabel"
+
+        android:layout_width="50dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="50dp"
+        android:autoSizeTextType="uniform"
+        android:gravity="center"
+
+        android:lines="1"
+        android:text="MINS"
+        android:textAlignment="center"
+        android:textColor="?attr/Accent"
+        android:textStyle="bold"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pracsessDuration" />
+
+    <TextView
+        android:id="@+id/pracsessTitle"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="50dp"
+
+        android:text="20230715"
+
+        android:shadowColor="?attr/Accent"
+        android:shadowRadius="5"
+        android:shadowDy="-5"
+
+        android:autoSizeTextType="uniform"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textColor="?attr/Foreground"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pracsessDel" />
+
+    <ScrollView
+        android:id="@+id/pracsessScrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="25dp"
+        app:layout_constraintBottom_toTopOf="@+id/pracsessPlus"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pracsessTitle">
+
+        <TableLayout
+
+            android:id="@+id/pracsessTable"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:background="?attr/Accent"
+            android:padding="5dp"
+            >
+
+            <TableRow android:layout_height="40dp"
+                android:background="?attr/Foreground"
+                android:layout_margin="5dp"
+                >
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="4"
+                    android:autoSizeTextType="uniform"
+                    android:gravity="center"
+                    android:text="1"
+                    android:textAlignment="center"
+                    android:textColor="?attr/Background"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="10"
+                    android:autoSizeTextType="uniform"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="SongLongNameVerySuperLongWahahahahahhahahahahahahaa"
+                    android:textAlignment="center"
+                    android:textColor="?attr/Background"
+                    android:textStyle="bold"
+
+                    android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="999999"
+                    />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="10"
+                    android:autoSizeTextType="uniform"
+                    android:gravity="center"
+                    android:text="Artist"
+                    android:textAlignment="center"
+                    android:textColor="?attr/Background"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bin"
+                    android:backgroundTint="?attr/Background"
+                    android:layout_weight="1"
+
+                    />
+
+            </TableRow>
+
+            <TableRow android:layout_height="40dp"
+                android:background="?attr/Foreground"
+                android:layout_margin="5dp"
+                >
+
+                <TextView
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:autoSizeTextType="uniform"
+                    android:gravity="center"
+                    android:text="2"
+                    android:textAlignment="center"
+                    android:textColor="?attr/Background"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:autoSizeTextType="uniform"
+                    android:gravity="center"
+                    android:text="Song"
+                    android:textAlignment="center"
+                    android:textColor="?attr/Background"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:autoSizeTextType="uniform"
+                    android:gravity="center"
+                    android:text="Artist"
+                    android:textAlignment="center"
+                    android:textColor="?attr/Background"
+                    android:textStyle="bold" />
+            </TableRow>
+        </TableLayout>
+    </ScrollView>
+
+    <ImageView
+        android:id="@+id/pracsessPlus"
+
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="50dp"
+        android:background="@drawable/plus"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pracsessScrollView" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

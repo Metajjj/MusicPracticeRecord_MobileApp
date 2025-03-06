@@ -19,7 +19,6 @@
 
         android:textStyle="bold"
         android:shadowColor="?attr/Accent"
-
         android:shadowRadius="5"
         android:shadowDy="5"
 

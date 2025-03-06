@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:width="300px"
+    android:height="300px"
+    android:viewportHeight="300"
+    android:viewportWidth="300">
+
+    <!-- border -->
+    <path android:pathData="M 0,0 H 300 V 300 H 0 V 0" android:strokeWidth="5" android:strokeColor="?attr/Foreground" />
+
+    <path android:pathData="M 100 0 h 100 v 100 h 100 v 100 h -100 v 100 h -100 v -100 h -100 v -100 h 100 v -100"
+        android:strokeColor="?attr/Foreground"
+        android:strokeWidth="5"
+        android:fillColor="?attr/Accent"
+        />
+
+</vector>

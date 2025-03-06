@@ -1,7 +1,10 @@
 package com.example.musicpracticerecord;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -10,6 +13,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -51,8 +55,7 @@ public class Home extends AppCompatActivity {
 
         dh = DatabaseHandler.getInstance(context);
 
-        dh.ResetTables();
-        TestDb();
+        //TestDb();
 
         //TestSvg();
 
@@ -61,6 +64,8 @@ public class Home extends AppCompatActivity {
         new Thread(()->{
             SetupTable(findViewById(R.id.homeTable),LocalDate.now().getYear(), 1970,"Y");
         }).start();
+
+        findViewById(R.id.homeBg).setOnTouchListener(this::TouchGestureListener);
     }
 
     @Override
@@ -73,6 +78,7 @@ public class Home extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         ta.recycle();
+        dh.close();
 
         super.onDestroy();
     }
@@ -111,7 +117,7 @@ public class Home extends AppCompatActivity {
         tv.setPadding(DP2Pixel(3), DP2Pixel(3), DP2Pixel(3), DP2Pixel(3));
         tv.setTypeface(null, Typeface.BOLD);
 
-        tv.setText(""+DisplayNum);
+        tv.setText( DisplayNum < 10 ? "0"+DisplayNum : DisplayNum+"" );
         tv.setTextColor(ta.getColor(0,-1));
         tv.setBackgroundColor(ta.getColor(2,-1));
 
@@ -140,10 +146,15 @@ public class Home extends AppCompatActivity {
             for(var row : dh.CursorSorter(dh.getReadableDatabase().rawQuery("SELECT " + DatabaseHandler.DbStructure.PracticeSession.Date.class.getSimpleName()+" FROM "+DatabaseHandler.DbStructure.PracticeSession.class.getSimpleName()+" ;",null))
             ){ res.add(row.values().toArray()[0].toString()); }
 
-            if( res.contains(DisplayNum+"") )
+            //check if tag (int only) is match
+            var pureInt="";
+            var m = Pattern.compile("\\d+").matcher(tag + tv.getText().toString());
+            while(m.find()){ pureInt += m.group(); };
+            if( res.contains( pureInt ) )
             {
                 //Bin
                 iv.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.bin, getTheme()));
+                iv.setOnClickListener(v->ArrowClicked(tr,true));
                 tr.addView(iv, LytPrms);
 
                 //Pencil
@@ -151,7 +162,8 @@ public class Home extends AppCompatActivity {
                 iv.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.pencil, getTheme()));
                 tr.addView(iv, LytPrms);
             }else{
-                iv.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.arrow, getTheme()));
+                //Doesnt exist in DB
+                iv.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus, getTheme()));
                 tr.addView(iv, LytPrms);
             }
         }
@@ -164,26 +176,53 @@ public class Home extends AppCompatActivity {
         return tr;
     }
 
-    //TODO reshift
-    private void ArrowClicked(TableRow Vw){
-        System.out.println("Your tag: "+Vw.getTag());
+    private  void ArrowClicked (TableRow tr){ArrowClicked(tr,false);}
+
+    private void ArrowClicked(TableRow Vw, boolean bin){
+        //System.out.println("Your tag: "+Vw.getTag());
 
         var ImgVw = Vw.getChildAt(1);
-        var TxtVw = (TextView)Vw.getChildAt(0);
         var PrntTbl = ((TableLayout)Vw.getParent());
 
-        if(ImgVw.getRotation()==-90) {
+        if(Vw.getTag().toString().contains("D")) {
+
+            if(bin){
+                //Prompt to del
+                //System.out.println("bin");
+
+                System.err.println("TODO: delete from DB");
+                new AlertDialog.Builder(context)
+                    .setTitle("Confirm deletion")
+                    .setPositiveButton("Delete", null)
+                    .setNeutralButton("Cancel",null)
+                    .setOnCancelListener(null)
+                ;
+
+            } else{
+                //Move to edit page
+                //System.out.println("edit");
+
+                var Date="";
+                var m = Pattern.compile("\\d+").matcher(Vw.getTag()+"");
+                while(m.find()){
+                    Date += (m.group().toString().length()<2 ? "0" : "") + m.group()+"/";
+                }
+                Date = Date.substring(0,Date.length()-1);
+
+                startActivity(
+                    new Intent(this,PracSess.class)
+                        .putExtra("title",Date)
+                );
+            }
+            //Edit or plus or bin!
+
+        } else if(ImgVw.getRotation()==-90) {
             ImgVw.setRotation(0);
 
             ImgVw.setBackgroundTintList(ColorStateList.valueOf(ta.getColor(1, -1)));
             //PrntTbl.setBackgroundColor(ta.getColor(2,-1));
 
-            if(Vw.getTag().toString().contains("D")) {
-
-                //Edit or plus or bin!
-                System.out.println("CLicked D!");
-
-            } else if (Vw.getTag().toString().contains("M")) {
+            if (Vw.getTag().toString().contains("M")) {
 
                 var matcher = Pattern.compile("\\d+").matcher(Vw.getTag() + "");
 
@@ -222,10 +261,10 @@ public class Home extends AppCompatActivity {
             if (Vw.getTag().toString().contains("D")) {
                 PrntTbl.removeViewAt(PrntTbl.indexOfChild(Vw) + 1);
             }
-            if (Vw.getTag().toString().contains("M")) {
+            else if (Vw.getTag().toString().contains("M")) {
                     PrntTbl.removeViewAt(PrntTbl.indexOfChild(Vw)+1);
             }
-            if (Vw.getTag().toString().contains("Y")) {
+            else if (Vw.getTag().toString().contains("Y")) {
                     PrntTbl.removeViewAt(PrntTbl.indexOfChild(Vw)+1);
             }
         }
@@ -235,14 +274,25 @@ public class Home extends AppCompatActivity {
         return Math.round( TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,dp,getResources().getDisplayMetrics()) );
     }
 
+    private boolean TouchGestureListener(View v, MotionEvent me){
+        switch(me.getAction()){
+            case MotionEvent.ACTION_UP:
+                System.out.println("Released on: "+v.getClass().getSimpleName());
+        }
+
+        return true;
+    }
+
     private void TestDb(){
+        dh.ResetTables();
+
         dh.MockData();
 
         var res = dh.CursorSorter(dh.getReadableDatabase().rawQuery("SELECT * FROM Prac2Muse AS pm " +
                 "INNER JOIN PracticeSession AS ps " +
                 "ON pm.PrSsID = ps.Date " +
                 "INNER JOIN MusicPiece AS mp " +
-                "ON pm.MuPeSong = mp.Song AND pm.MuPeArtist = mp.Artist;"
+                "ON pm.MuPeID = mp.MusicPieceID;"
             ,null)
         );
 

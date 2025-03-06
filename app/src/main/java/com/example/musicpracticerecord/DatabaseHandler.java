@@ -26,6 +26,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             public static String[] Constraints = new String[]{};
         }
         public static class MusicPiece{
+            public static class MusicPieceID{
+                public String Name= this.getClass().getSimpleName(), Type="INTEGER PRIMARY KEY AUTOINCREMENT";
+            }
             public static class Song{
                 public String Name= this.getClass().getSimpleName(), Type="TEXT";
             }
@@ -33,7 +36,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 public String Name=this.getClass().getSimpleName(), Type="TEXT";
             }
             public static String[] Constraints = new String[]{
-                String.format("PRIMARY KEY(%1$s , %2$s)",new Song().Name, new Artist().Name )
+                String.format("UNIQUE(%1$s , %2$s)",new Song().Name, new Artist().Name )
               //unique(col1, col2) = (d,a)(d,a) not allowed (d,a)(d,b) allowed
                 //PK = unique & notNull
             };
@@ -42,11 +45,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             public static class PrSsID{
                 public String Name = this.getClass().getSimpleName(), Type = "INTEGER";
             }
-            public static class MuPeSong{
-                public String Name = this.getClass().getSimpleName(), Type = "TEXT";
-            }
-            public static class MuPeArtist{
-                public String Name = this.getClass().getSimpleName(), Type = "TEXT";
+            public static class MuPeID{
+                public String Name = this.getClass().getSimpleName(), Type = "INTEGER";
             }
             public static String[] Constraints = new String[]{
                 String.format("FOREIGN KEY (%1$s) REFERENCES %2$s (`%3$s`) ON DELETE CASCADE ON UPDATE CASCADE"
@@ -56,9 +56,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 //Order doesnt matter but table must contain same colName as PK
                 //Can be opposite to PK constraint order
                 //Must be same order on the ForeignKey Constraint
-                String.format("FOREIGN KEY (%1$s,%2$s) REFERENCES %3$s (`%4$s` , `%5$s`) ON DELETE CASCADE ON UPDATE CASCADE"
+                String.format("FOREIGN KEY (%1$s) REFERENCES %2$s (`%3$s`) ON DELETE CASCADE ON UPDATE CASCADE"
                     ,
-                    new Prac2Muse.MuPeSong().Name, MuPeArtist.class.getSimpleName(), MusicPiece.class.getSimpleName(), new MusicPiece.Song().Name, MusicPiece.Artist.class.getSimpleName() )
+                    new Prac2Muse.MuPeID().Name, MusicPiece.class.getSimpleName(), new MusicPiece.MusicPieceID().Name )
             };
         }
     }
@@ -210,13 +210,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     protected synchronized void MockData(){
         //PracSess
-        this.getWritableDatabase().execSQL("INSERT INTO PracticeSession (`Date`, Duration) VALUES (5, 240), (3,30) ;");
+        this.getWritableDatabase().execSQL("INSERT INTO PracticeSession (`Date`, Duration) VALUES (20251228, 240), (20240229,30) ;");
 
         //MusPie
         this.getWritableDatabase().execSQL("INSERT INTO MusicPiece (song, artist) VALUES  ('Song1', 'Artist1'), ('Song2','Artist1'), ('Song1','Artist2') ;");
 
         //Junc
-        this.getWritableDatabase().execSQL("INSERT INTO Prac2Muse (PrSsID, MuPeSong, MuPeArtist) VALUES (5, 'Song1', 'Artist1');");
+        this.getWritableDatabase().execSQL("INSERT INTO Prac2Muse (PrSsID, MuPeID) VALUES (20251228, 1);");
     }
 
     protected synchronized ArrayList<HashMap<String,String>> CursorSorter(Cursor c){
