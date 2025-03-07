@@ -11,7 +11,7 @@
     >
 
     <ImageView
-        android:id="@+id/praccsessBackArrow"
+        android:id="@+id/pracsessBackArrow"
 
         android:rotation="90"
 
@@ -40,8 +40,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <EditText
         android:id="@+id/pracsessDuration"
+        android:focusedByDefault="false"
 
         android:layout_width="50dp"
         android:layout_height="50dp"
@@ -55,9 +56,10 @@
         android:shadowRadius="6"
         android:shadowDy="2"
 
+        android:inputType="number"
         android:gravity="center"
         android:lines="1"
-        android:text="Artist"
+        android:text="00"
         android:textAlignment="center"
         android:textColor="?attr/Foreground"
         android:textStyle="bold"
@@ -158,6 +160,8 @@
                     android:autoSizeTextType="uniform"
                     android:gravity="center"
                     android:singleLine="true"
+
+                    android:padding="1dp"
                     android:text="SongLongNameVerySuperLongWahahahahahhahahahahahahaa"
                     android:textAlignment="center"
                     android:textColor="?attr/Background"
