@@ -55,17 +55,18 @@ public class Home extends AppCompatActivity {
 
         dh = DatabaseHandler.getInstance(context);
 
-        //TestDb();
+        findViewById(R.id.homeTitle).setOnClickListener(v->{
+            TestDb();
+        });
 
         //TestSvg();
 
-        ((TableLayout) findViewById(R.id.homeTable)).removeAllViews();
+        findViewById(R.id.homeBg).setOnTouchListener(this::TouchGestureListener);
 
         new Thread(()->{
+            ((TableLayout) findViewById(R.id.homeTable)).removeAllViews();
             SetupTable(findViewById(R.id.homeTable),LocalDate.now().getYear(), 1970,"Y");
         }).start();
-
-        findViewById(R.id.homeBg).setOnTouchListener(this::TouchGestureListener);
     }
 
     @Override
@@ -73,6 +74,11 @@ public class Home extends AppCompatActivity {
         ta = this.obtainStyledAttributes(new int[]{R.attr.Background, R.attr.Foreground, R.attr.Accent});
 
         super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override

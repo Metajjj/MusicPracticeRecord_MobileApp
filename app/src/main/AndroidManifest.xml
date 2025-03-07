@@ -20,7 +20,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".PracSess" android:screenOrientation="portrait" />
+        <activity android:name=".PracSess" android:screenOrientation="portrait" android:windowSoftInputMode="stateHidden" />
+        <!-- hidden so not auto in view when forced-focus in new activity -->
 
     </application>
 

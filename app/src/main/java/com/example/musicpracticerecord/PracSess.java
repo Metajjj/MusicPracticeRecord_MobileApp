@@ -37,6 +37,7 @@ public class PracSess extends AppCompatActivity {
         ((TextView)findViewById(R.id.pracsessTitle)).setText( getIntent().getExtras().getString("title") );
 
         //MakeTv1(findViewById(R.id.pracsessBg));
+        new Thread(this::Setup).start();
 
         //SET onclicks
         findViewById(R.id.pracsessBackArrow).setOnClickListener(v->{
@@ -48,13 +49,6 @@ public class PracSess extends AppCompatActivity {
                 ((TableLayout)findViewById(R.id.pracsessTable)).getChildAt(i)
                 );
             }
-
-            //TODO fix del from jt
-            //WHERE Song = SongLongNameVery
-            //Default Iv doesnt work!
-
-            //TODO TODO auto-focus on EditText
-
         });
         findViewById(R.id.pracsessPlus).setOnClickListener(v->{
             //TODO search song + del from MP db (fragment??)
@@ -63,7 +57,7 @@ public class PracSess extends AppCompatActivity {
             [ ScrollableView {
                 PLUS | Song | Artist | BIN
                 PLUS | Song2 | Artist2 | BIN
-                 <bin = del, any other = add to PracSess>
+                 <bin = del, plus = add to PracSess, name = overwrite searchBar>
             }]
             */
         });
@@ -100,8 +94,10 @@ public class PracSess extends AppCompatActivity {
         TableLayout TL = findViewById(R.id.pracsessTable);
         TL.removeAllViews();
 
+        TL.setOnClickListener(v->{System.out.println("TEST");});
+
         for (var music : res) {
-            TL.addView(SetupTablerow(music) );
+            TL.post(()->{TL.addView(SetupTablerow(music)); } );
         }
     }
 
@@ -129,13 +125,15 @@ public class PracSess extends AppCompatActivity {
         Iv.setBackground(ResourcesCompat.getDrawable(getResources(),R.drawable.bin, getTheme()));
         Iv.setBackgroundTintList(ColorStateList.valueOf(ta.getColor(0,-1)));
 
-        Iv.setOnClickListener(v->DelFromJT((TableRow) v.getParent()));
+        Iv.setOnClickListener(v-> {
+            System.out.println("bin clicked");
+            DelFromJT((TableRow) v.getParent());
+        });
 
         tr.addView(Iv,LytPrms);
 
         //Tr
         tr.setBackgroundColor(ta.getColor(1,-1));
-
         ta.recycle();
         return tr;
     }
@@ -170,22 +168,35 @@ public class PracSess extends AppCompatActivity {
         var dh = DatabaseHandler.getInstance(context);
         String song = ((TextView)tr.getChildAt(1)).getText()+"", artist = ((TextView)tr.getChildAt(2)).getText()+"";
 
-        var res = dh.CursorSorter(dh.getReadableDatabase().rawQuery("SELECT " + DatabaseHandler.DbStructure.MusicPiece.MusicPieceID.class.getSimpleName() + " FROM " + DatabaseHandler.DbStructure.MusicPiece.class.getSimpleName() + " WHERE " + DatabaseHandler.DbStructure.MusicPiece.Song.class.getSimpleName() + " = "+song+" AND " + DatabaseHandler.DbStructure.MusicPiece.Artist.class.getSimpleName() + " = "+artist+" ;", null
+        var res = dh.CursorSorter(dh.getReadableDatabase().rawQuery("SELECT " + DatabaseHandler.DbStructure.MusicPiece.MusicPieceID.class.getSimpleName() + " FROM " + DatabaseHandler.DbStructure.MusicPiece.class.getSimpleName() + " WHERE " + DatabaseHandler.DbStructure.MusicPiece.Song.class.getSimpleName() + " = '"+song+"' AND " + DatabaseHandler.DbStructure.MusicPiece.Artist.class.getSimpleName() + " = '"+artist+"' ;", null
         ));
 
-        System.out.println("DEL FROM JT!");
+        var PrSsIDsplit = ((TextView)findViewById(R.id.pracsessTitle)).getText().toString().split("/");
 
         for(var HmId : res){
 
-            var PrSsIDsplit = ((TextView)findViewById(R.id.pracsessTitle)).getText().toString().split("/");
+
 
             dh.getWritableDatabase().delete(DatabaseHandler.DbStructure.Prac2Muse.class.getSimpleName(),
-                String.format(" %1$s = ? AND %2$s = ? ",
+                    //SQL string = '' not ""
+                String.format(" %1$s = "+String.join("",PrSsIDsplit)+" AND %2$s = "+HmId.get(DatabaseHandler.DbStructure.MusicPiece.MusicPieceID.class.getSimpleName())+" ",
                     DatabaseHandler.DbStructure.Prac2Muse.PrSsID.class.getSimpleName(), DatabaseHandler.DbStructure.Prac2Muse.MuPeID.class.getSimpleName())
-                ,new String[]{
-                    String.join("",PrSsIDsplit), HmId.get(DatabaseHandler.DbStructure.MusicPiece.MusicPieceID.class.getSimpleName())
-                }
+                ,null
             );
+        }
+
+        var NumOfRows = dh.getReadableDatabase().rawQuery("SELECT * FROM " + DatabaseHandler.DbStructure.Prac2Muse.class.getSimpleName() + " WHERE " + DatabaseHandler.DbStructure.Prac2Muse.PrSsID.class.getSimpleName()+" = "+String.join("",PrSsIDsplit)+" ;", null).getCount();
+
+        if (NumOfRows==0){
+            //Del if not connected to any music pieces
+            dh.getWritableDatabase().execSQL(
+                String.format("DELETE FROM %1$s WHERE `%2$s` = %3$s ;",
+                    DatabaseHandler.DbStructure.PracticeSession.class.getSimpleName(), DatabaseHandler.DbStructure.PracticeSession.Date.class.getSimpleName(), String.join("",PrSsIDsplit)
+                    )
+            );
+            System.out.println("DEL FROM DB");
+
+            System.out.println(dh.CursorSorter(dh.getReadableDatabase().rawQuery("SELECT * FROM " + DatabaseHandler.DbStructure.PracticeSession.class.getSimpleName()+" ;",null)));
         }
 
         startActivity(getIntent()); //Reload itself
