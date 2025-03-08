@@ -137,6 +137,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     private DatabaseHandler(Context c) {
         super(c, DBname, null, 1);
+
+        //If tbl doesnt exist.. create!
+        try{
+            this.getReadableDatabase().rawQuery("SELECT * FROM " + DbStructure.PracticeSession.class.getSimpleName(),null);
+        } catch (Exception e){
+            //Doesnt exist, need to create!
+            ResetTables();
+        }
     }
 
     protected synchronized void WipeDB(Context c){
@@ -243,5 +251,5 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {}
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {ResetTables();}
 }

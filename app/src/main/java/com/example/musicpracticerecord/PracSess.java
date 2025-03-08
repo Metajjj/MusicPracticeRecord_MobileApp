@@ -45,6 +45,8 @@ public class PracSess extends AppCompatActivity {
         context= getApplicationContext();
         dh = DatabaseHandler.getInstance(context);
 
+        getSupportActionBar().hide();
+
         ((TextView)findViewById(R.id.pracsessTitle)).setText( getIntent().getExtras().getString("title") );
 
         //MakeTv1(findViewById(R.id.pracsessBg));
@@ -258,6 +260,7 @@ public class PracSess extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        findViewById(R.id.pracsessBackArrow).performClick();
         super.onBackPressed();
     }
 

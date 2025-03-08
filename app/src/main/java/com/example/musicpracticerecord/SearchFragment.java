@@ -115,6 +115,8 @@ public class SearchFragment extends DialogFragment {
                 },Interval);
             }
         });
+
+        UpdateResults(); //Auto setup
     }
 
     private void UpdateResults(){
@@ -130,7 +132,7 @@ public class SearchFragment extends DialogFragment {
                 ,null)
         );
 
-        var LyPm = new TableLayout.LayoutParams(); LyPm.setMargins(0,DP2Pixel(5),0,0);
+        var LyPm = new TableLayout.LayoutParams(); LyPm.setMargins(0,DP2Pixel( TypedValue.COMPLEX_UNIT_DIP ,5),0,0);
 
         for(var row : res){
             String Song = row.get(DatabaseHandler.DbStructure.MusicPiece.Song.class.getSimpleName()), Artist = row.get(DatabaseHandler.DbStructure.MusicPiece.Artist.class.getSimpleName());
@@ -143,25 +145,23 @@ public class SearchFragment extends DialogFragment {
         TableRow tr = new TableRow(context);
         TypedArray ta = getActivity().obtainStyledAttributes(new int[]{R.attr.Background, R.attr.Foreground, R.attr.Accent});
 
-        TableRow.LayoutParams LytPrms = new TableRow.LayoutParams(0,DP2Pixel(20),20);
+        TableRow.LayoutParams LytPrms = new TableRow.LayoutParams(0,DP2Pixel( TypedValue.COMPLEX_UNIT_DIP ,40),20);
 
         //TxtVw
         TextView Tv = SetupTv(Song);
         Tv.setTextColor(ta.getColor(1,0xFFFF0000));
-        Tv.setOnClickListener(v->
-            EditSong.setText( ((TextView)v).getText() )
-        );
+        Tv.setOnClickListener(v-> EditSong.setText( ((TextView)v).getText() ) );
+        Tv.setOnLongClickListener(v-> {Toast.makeText(context,"Song\n"+((TextView)v).getText(), Toast.LENGTH_LONG).show(); return true; } );
         tr.addView(Tv,LytPrms);
 
         Tv = SetupTv(Artist);
         Tv.setTextColor(ta.getColor(1,0xFF00FF00));
-        Tv.setOnClickListener(v->
-            EditArtist.setText( ((TextView)v).getText() )
-        );
+        Tv.setOnClickListener(v-> EditArtist.setText( ((TextView)v).getText() ) );
+        Tv.setOnLongClickListener(v-> {Toast.makeText(context,"Song\n"+((TextView)v).getText(), Toast.LENGTH_LONG).show(); return true;} );
         tr.addView(Tv,LytPrms);
 
         //ImgVw
-        LytPrms = new TableRow.LayoutParams(DP2Pixel(20),DP2Pixel(20),1);
+        LytPrms = new TableRow.LayoutParams(DP2Pixel( TypedValue.COMPLEX_UNIT_DIP ,30),DP2Pixel( TypedValue.COMPLEX_UNIT_DIP ,40),1);
         var Iv = new ImageView(context);
         Iv.setBackground(ResourcesCompat.getDrawable(getResources(),R.drawable.bin, getActivity().getTheme()));
         Iv.setOnClickListener(v-> DelMusPie((TableRow) v.getParent()) );
@@ -186,7 +186,7 @@ public class SearchFragment extends DialogFragment {
 
         tv.setGravity(Gravity.CENTER);
         tv.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        tv.setPadding(DP2Pixel(1), DP2Pixel(1), DP2Pixel(1), DP2Pixel(1));
+        tv.setPadding(DP2Pixel( TypedValue.COMPLEX_UNIT_DIP ,1), DP2Pixel( TypedValue.COMPLEX_UNIT_DIP ,1), DP2Pixel( TypedValue.COMPLEX_UNIT_DIP ,1), DP2Pixel( TypedValue.COMPLEX_UNIT_DIP ,1));
         tv.setTypeface(null, Typeface.BOLD);
         tv.setEllipsize(TextUtils.TruncateAt.MARQUEE); tv.setMarqueeRepeatLimit(999999);
         tv.setSelected(true);
@@ -284,7 +284,7 @@ public class SearchFragment extends DialogFragment {
         getActivity().startActivity(getActivity().getIntent()); //Reload itself
     }
 
-    private int DP2Pixel(float dp){
-        return Math.round( TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,dp,getResources().getDisplayMetrics()) );
+    private int DP2Pixel( int UnitType, float value){
+        return Math.round( TypedValue.applyDimension(UnitType,value,getResources().getDisplayMetrics()) );
     }
 }

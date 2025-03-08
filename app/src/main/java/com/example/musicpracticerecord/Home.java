@@ -58,7 +58,7 @@ public class Home extends AppCompatActivity {
         dh = DatabaseHandler.getInstance(context);
 
         findViewById(R.id.homeTitle).setOnClickListener(v->{
-            TestDb();
+            //TestDb();
         });
 
         //TestSvg();
@@ -237,7 +237,17 @@ public class Home extends AppCompatActivity {
                 //Add to DB
                 var CV = new ContentValues();
                 CV.put(DatabaseHandler.DbStructure.PracticeSession.Date.class.getSimpleName(),Date.replaceAll("\\D+",""));
-                dh.getReadableDatabase().insert(DatabaseHandler.DbStructure.PracticeSession.class.getSimpleName(),null,CV);
+
+                var wDB = dh.getWritableDatabase();
+
+                try {
+                    wDB.beginTransaction();
+
+                    wDB.insert(DatabaseHandler.DbStructure.PracticeSession.class.getSimpleName(), null, CV);
+
+                    wDB.setTransactionSuccessful();
+                } catch (Exception e){ System.err.println(e); }
+                finally {wDB.endTransaction(); }
 
                 /*System.out.println( "Adding\n "+
                     dh.CursorSorter(
