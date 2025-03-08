@@ -2,6 +2,7 @@ package com.example.musicpracticerecord;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -63,11 +65,13 @@ public class Home extends AppCompatActivity {
 
         findViewById(R.id.homeBg).setOnTouchListener(this::TouchGestureListener);
 
-        new Thread(()->{
-            ((TableLayout) findViewById(R.id.homeTable)).removeAllViews();
-            SetupTable(findViewById(R.id.homeTable),LocalDate.now().getYear(), 1970,"Y");
-        }).start();
+        setup.start();
     }
+
+    Thread setup = new Thread(()->{
+        ((TableLayout) findViewById(R.id.homeTable)).removeAllViews();
+        SetupTable(findViewById(R.id.homeTable),LocalDate.now().getYear(), 1970,"Y");
+    });
 
     @Override
     protected void onStart() {
@@ -85,6 +89,8 @@ public class Home extends AppCompatActivity {
     protected void onDestroy() {
         ta.recycle();
         dh.close();
+
+
 
         super.onDestroy();
     }
@@ -147,7 +153,6 @@ public class Home extends AppCompatActivity {
             //is D day!
             var dh = DatabaseHandler.getInstance(context);
 
-            //TODO get VALS
             var res = new ArrayList<String>();
             for(var row : dh.CursorSorter(dh.getReadableDatabase().rawQuery("SELECT " + DatabaseHandler.DbStructure.PracticeSession.Date.class.getSimpleName()+" FROM "+DatabaseHandler.DbStructure.PracticeSession.class.getSimpleName()+" ;",null))
             ){ res.add(row.values().toArray()[0].toString()); }
@@ -196,13 +201,27 @@ public class Home extends AppCompatActivity {
                 //Prompt to del
                 //System.out.println("bin");
 
-                System.err.println("TODO: delete from DB");
-                new AlertDialog.Builder(context)
-                    .setTitle("Confirm deletion")
-                    .setPositiveButton("Delete", null)
-                    .setNeutralButton("Cancel",null)
-                    .setOnCancelListener(null)
-                ;
+                new AlertDialog.Builder(this)
+                    .setTitle("Delete "+Vw.getTag().toString().replaceAll("\\D+","/").substring(1)+" ?")
+                    .setPositiveButton("DELETE", (dialogInterface, i) -> {
+                        System.err.println("TODO: delete from DB");
+
+                        dh.getReadableDatabase().beginTransaction();
+                        try {
+                            dh.getReadableDatabase().delete(DatabaseHandler.DbStructure.PracticeSession.class.getSimpleName(), DatabaseHandler.DbStructure.PracticeSession.Date.class.getSimpleName()+" = "+Vw.getTag().toString().replaceAll("\\D+","")
+                                ,null);
+
+                            dh.getReadableDatabase().setTransactionSuccessful();
+                        } catch (Exception e) {
+                            System.err.println("ERR deleting: " + e);
+                            Toast.makeText(context, "ERR deleting!", Toast.LENGTH_LONG).show();
+                        }finally {
+                            dh.getReadableDatabase().endTransaction();
+                        }
+
+                    })
+                    .setNeutralButton("CANCEL",(dI,i)->{})
+                    .show();
 
             } else{
                 //Move to edit page
@@ -214,6 +233,17 @@ public class Home extends AppCompatActivity {
                     Date += (m.group().toString().length()<2 ? "0" : "") + m.group()+"/";
                 }
                 Date = Date.substring(0,Date.length()-1);
+
+                //Add to DB
+                var CV = new ContentValues();
+                CV.put(DatabaseHandler.DbStructure.PracticeSession.Date.class.getSimpleName(),Date.replaceAll("\\D+",""));
+                dh.getReadableDatabase().insert(DatabaseHandler.DbStructure.PracticeSession.class.getSimpleName(),null,CV);
+
+                /*System.out.println( "Adding\n "+
+                    dh.CursorSorter(
+                        dh.getReadableDatabase().rawQuery("SELECT * FROM " + DatabaseHandler.DbStructure.PracticeSession.class.getSimpleName(),null)
+                    )
+                );*/
 
                 startActivity(
                     new Intent(this,PracSess.class)
@@ -306,7 +336,6 @@ public class Home extends AppCompatActivity {
     }
 
     private  void  TestSvg(){
-        //TODO layout
         var ImgVw = (ImageView) findViewById(R.id.homeTable).findViewWithTag(2024);
 
         new Thread(()->{

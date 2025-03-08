@@ -152,8 +152,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     protected synchronized void ResetTables(SQLiteDatabase s) {
-        //s.beginTransaction(); //TODO research beginTransact
-
         ArrayList<String> Cmds = new ArrayList<>();
 
         Cmds.add("PRAGMA foreign_keys = ON;");
@@ -186,7 +184,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     }
                 }
 
-                //TODO err getting constraints for junction table
                 String[] Constraints = (String[]) C.getField("Constraints").get(null);
 
                 //Add constraints
@@ -206,7 +203,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             s.execSQL(cmd);
         }
     }
-    //TODO practice https://sqliteonline.com/
 
     protected synchronized void MockData(){
         //PracSess

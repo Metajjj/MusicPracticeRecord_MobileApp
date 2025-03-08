@@ -58,7 +58,7 @@
         android:inputType="number"
         android:gravity="center"
         android:lines="1"
-        android:text="00"
+        android:hint="00"
         android:textAlignment="center"
         android:textColor="?attr/Foreground"
         android:textStyle="bold"

@@ -1,16 +1,24 @@
 package com.example.musicpracticerecord;
 
+import static android.content.Intent.FLAG_ACTIVITY_NO_HISTORY;
+
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -20,12 +28,14 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.FragmentManager;
 
 import java.util.HashMap;
 
 public class PracSess extends AppCompatActivity {
 
     private Context context;
+    private DatabaseHandler dh;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -33,14 +43,59 @@ public class PracSess extends AppCompatActivity {
 
         setContentView(R.layout.pracsess);
         context= getApplicationContext();
+        dh = DatabaseHandler.getInstance(context);
 
         ((TextView)findViewById(R.id.pracsessTitle)).setText( getIntent().getExtras().getString("title") );
 
         //MakeTv1(findViewById(R.id.pracsessBg));
         new Thread(this::Setup).start();
 
+                                    //get main loop for Toast UI
+        Handler DurationTxtWatch = new Handler(Looper.getMainLooper());
+        DurationTxtWatch.postDelayed(()->{
+        ((EditText)findViewById(R.id.pracsessDuration)).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            @Override
+            public void afterTextChanged(Editable editable) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                DurationTxtWatch.removeCallbacksAndMessages(null);
+                DurationTxtWatch.postDelayed(()->{
+
+                    ContentValues CV = new ContentValues();
+                    CV.put(DatabaseHandler.DbStructure.PracticeSession.Duration.class.getSimpleName(),charSequence+"");
+
+                    dh.getWritableDatabase().update(DatabaseHandler.DbStructure.PracticeSession.class.getSimpleName(),CV, DatabaseHandler.DbStructure.PracticeSession.Date.class.getSimpleName()+" = "+getIntent().getExtras().getString("title").replaceAll("\\D+",""),null);
+
+                    Toast.makeText(context,"Duration saved!", Toast.LENGTH_SHORT).show();
+                },2*1000);
+            }
+        });
+        },2*1000);
+
         //SET onclicks
+
+        //Able to reload itself
+        findViewById(R.id.pracsessTitle).setOnClickListener(v-> startActivity(getIntent().addFlags(FLAG_ACTIVITY_NO_HISTORY)) );
+
         findViewById(R.id.pracsessBackArrow).setOnClickListener(v->{
+
+                //WORKS
+            //Del from db if no childs in table
+            if( ((TableLayout)findViewById(R.id.pracsessTable)).getChildCount() == 0){
+                //System.out.println("Empty to del");
+
+                dh.getReadableDatabase().delete(DatabaseHandler.DbStructure.PracticeSession.class.getSimpleName(), DatabaseHandler.DbStructure.PracticeSession.Date.class.getSimpleName() + " = "+ getIntent().getExtras().getString("title").replaceAll("\\D+",""),null);
+            }
+
+            /*System.out.println(
+                dh.CursorSorter(
+                    dh.getReadableDatabase().rawQuery("SELECT * FROM " + DatabaseHandler.DbStructure.PracticeSession.class.getSimpleName(),null)
+                )
+            );*/
+
             startActivity(new Intent(this,Home.class));
         });
         findViewById(R.id.pracsessDel).setOnClickListener(v->{
@@ -51,7 +106,6 @@ public class PracSess extends AppCompatActivity {
             }
         });
         findViewById(R.id.pracsessPlus).setOnClickListener(v->{
-            //TODO search song + del from MP db (fragment??)
             /*
             [ Song | Artist ] (can input.. update on few secs no interaction)
             [ ScrollableView {
@@ -60,6 +114,8 @@ public class PracSess extends AppCompatActivity {
                  <bin = del, plus = add to PracSess, name = overwrite searchBar>
             }]
             */
+            findViewById(R.id.pracsessFL).setZ(100);
+            getSupportFragmentManager().beginTransaction().replace(R.id.pracsessFL,SearchFragment.class, null).commit();
         });
     }
 
@@ -174,9 +230,6 @@ public class PracSess extends AppCompatActivity {
         var PrSsIDsplit = ((TextView)findViewById(R.id.pracsessTitle)).getText().toString().split("/");
 
         for(var HmId : res){
-
-
-
             dh.getWritableDatabase().delete(DatabaseHandler.DbStructure.Prac2Muse.class.getSimpleName(),
                     //SQL string = '' not ""
                 String.format(" %1$s = "+String.join("",PrSsIDsplit)+" AND %2$s = "+HmId.get(DatabaseHandler.DbStructure.MusicPiece.MusicPieceID.class.getSimpleName())+" ",
@@ -194,12 +247,18 @@ public class PracSess extends AppCompatActivity {
                     DatabaseHandler.DbStructure.PracticeSession.class.getSimpleName(), DatabaseHandler.DbStructure.PracticeSession.Date.class.getSimpleName(), String.join("",PrSsIDsplit)
                     )
             );
-            System.out.println("DEL FROM DB");
+            System.out.println("\nDEL FROM DB\n");
 
             System.out.println(dh.CursorSorter(dh.getReadableDatabase().rawQuery("SELECT * FROM " + DatabaseHandler.DbStructure.PracticeSession.class.getSimpleName()+" ;",null)));
         }
 
-        startActivity(getIntent()); //Reload itself
+        //Force a reload
+        findViewById(R.id.pracsessTitle).performClick();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     private int DP2Pixel(float dp){

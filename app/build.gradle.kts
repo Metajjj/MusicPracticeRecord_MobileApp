@@ -1,6 +1,9 @@
+import com.android.build.gradle.internal.scope.ProjectInfo.Companion.getBaseName
+
 plugins {
     alias(libs.plugins.android.application)
 }
+
 
 android {
     namespace = "com.example.musicpracticerecord"
